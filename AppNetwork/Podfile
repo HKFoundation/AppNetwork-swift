@@ -1,0 +1,8 @@
+platform :ios, '17.0'
+use_frameworks!
+inhibit_all_warnings!
+
+target 'AppNetwork' do
+  # swift 框架
+    pod 'Alamofire', '~> 4.9.1'
+end

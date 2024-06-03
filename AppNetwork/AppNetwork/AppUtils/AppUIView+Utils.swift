@@ -2,7 +2,7 @@
 //  AppUIView+Utils.swift
 //  AppUtils
 //
-//  Created by Code on 2020/6/19.
+//  Created by bormil on 2020/6/19.
 //  Copyright © 2020 北京卡友在线科技有限公司. All rights reserved.
 //
 

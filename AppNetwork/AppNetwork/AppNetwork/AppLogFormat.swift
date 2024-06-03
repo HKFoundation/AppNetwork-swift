@@ -2,7 +2,7 @@
 //  AppLogFormat.swift
 //  AppNetwork
 //
-//  Created by Code on 2020/4/29.
+//  Created by bormil on 2020/4/29.
 //  Copyright © 2020 北京卡友在线科技有限公司. All rights reserved.
 //
 

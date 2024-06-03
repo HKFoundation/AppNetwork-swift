@@ -2,7 +2,7 @@
 //  AppError.swift
 //  AppNetwork
 //
-//  Created by Code on 2020/5/9.
+//  Created by bormil on 2020/5/9.
 //  Copyright © 2020 北京卡友在线科技有限公司. All rights reserved.
 //
 
@@ -57,7 +57,7 @@ class AppError: NSObject {
                      -3004: "无法删除文件",
                      -3005: "无法移动文件",
                      -3006: "下载失败，因为下载数据的解码在流中失败",
-                     -3007: "下载失败，因为下载数据的解码未能完成"] as [AnyHashable: String]
+                     -3007: "下载失败，因为下载数据的解码未能完成"] as [Int: String]
 
         return codes[code] ?? "无法识别的错误码"
     }

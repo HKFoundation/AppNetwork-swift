@@ -15,8 +15,8 @@ class AppNetwork: NSObject {
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
     /// 设置请求超时时间，单位是秒
-    class func configLoadTimed(pTimed: TimeInterval) {
-        AppTaskUtils().configLoadTimed(pTimed: pTimed)
+    class func configLoadTimed(timed: TimeInterval) {
+        AppTaskUtils().configLoadTimed(timed: timed)
     }
 
     /// 用于指定网络请求接口的基础URL

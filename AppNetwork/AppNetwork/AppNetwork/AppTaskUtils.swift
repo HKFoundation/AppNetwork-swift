@@ -16,11 +16,11 @@ public typealias AppTaskError = (_ error: AnyObject) -> Void
 public typealias AppTaskProgress = (_ bytesLoad: CLongLong, _ bytesTotal: CLongLong) -> Void
 
 class AppTaskUtils: NSObject {
-    private static var appTimed: TimeInterval? = 30 /// 请求超时时间 default 30 秒
+    private static var timed: TimeInterval? = 30 /// 请求超时时间 default 30 秒
 
     private static var manager: SessionManager? /// SessionManager 实例对象，自定义对象需要强引用
 
-    private static var app_baseURL: String? = "" /// 设置 baseURL
+    private static var baseURL: String? = "" /// 设置 baseURL
 
     private var md5CacheURL = String()
 
@@ -29,13 +29,13 @@ class AppTaskUtils: NSObject {
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
     /// 设置请求超时时间，单位是秒
-    func configLoadTimed(pTimed: TimeInterval) {
-        AppTaskUtils.appTimed = pTimed
+    func configLoadTimed(timed: TimeInterval) {
+        AppTaskUtils.timed = timed
     }
 
     /// 用于指定网络请求接口的基础URL
     func configBaseURL(url: String) {
-        AppTaskUtils.app_baseURL = url
+        AppTaskUtils.baseURL = url
     }
 
     /// 获取当前的基础URL
@@ -44,13 +44,9 @@ class AppTaskUtils: NSObject {
             return url
         } else {
             /// 用于判断接口地址属于哪个域名
-            AppTaskUtils.app_baseURL = AppURL().baseURL(url: url)
+            AppTaskUtils.baseURL = AppURL().baseURL(url: url)
         }
-        return AppTaskUtils.app_baseURL!
-    }
-
-    fileprivate func app_baseURL(url: String) {
-        AppTaskUtils.app_baseURL = baseURL(url: url)
+        return AppTaskUtils.baseURL!
     }
 
     /// 取消特定连接请求
@@ -104,7 +100,7 @@ class AppTaskUtils: NSObject {
     }
 
     @discardableResult
-    fileprivate func reqForNetwork(url: String, mode: HTTPMethod, params: [String: Any], cache: Bool, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
+    private func reqForNetwork(url: String, mode: HTTPMethod, params: [String: Any], cache: Bool, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
         var appTask: DataRequest?
 
         md5CacheURL = md5String(pText: append(url: url, params: params))
@@ -157,7 +153,7 @@ class AppTaskUtils: NSObject {
         /// 获取缓存目录
         let cacheURL = NSURL(fileURLWithPath: AppCacheUtils().cacheURL()).appendingPathComponent(md5CacheURL)?.path
         /// 如果当前数据有缓存则返回缓存数据
-        let cache = AppCacheUtils().configContentLocal(atPath: cacheURL!)
+        let cache = AppCacheUtils().configContentLoadLocal(atPath: cacheURL!)
         if cacheURL != nil && cache != nil {
             return (true, cache)
         }
@@ -173,8 +169,8 @@ class AppTaskUtils: NSObject {
         guard AppTaskUtils.manager != nil else {
             let configuration = URLSessionConfiguration.default
             configuration.httpMaximumConnectionsPerHost = 3
-            if AppTaskUtils.appTimed != 30 {
-                configuration.timeoutIntervalForRequest = AppTaskUtils.appTimed!
+            if AppTaskUtils.timed != 30 {
+                configuration.timeoutIntervalForRequest = AppTaskUtils.timed!
             }
 
             AppTaskUtils.manager = Alamofire.SessionManager(configuration: configuration)
@@ -196,7 +192,8 @@ class AppTaskUtils: NSObject {
         if url.hasPrefix("http://") || url.hasPrefix("https://") {
             return url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         }
-        app_baseURL(url: url)
+
+        AppTaskUtils.baseURL = baseURL(url: url)
         let append = appendURL(url: url).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
 
         return append
@@ -213,18 +210,18 @@ class AppTaskUtils: NSObject {
 
         var appendURL = url
         if !url.hasPrefix("http://") && !url.hasPrefix("https://") {
-            if AppTaskUtils.app_baseURL!.hasSuffix("/") == true { /// baseURL末尾有"/"
+            if AppTaskUtils.baseURL!.hasSuffix("/") == true { /// baseURL末尾有"/"
                 if url.hasPrefix("/") == true {
                     var p = url
-                    appendURL = AppTaskUtils.app_baseURL! + String(p.removeFirst())
+                    appendURL = AppTaskUtils.baseURL! + String(p.removeFirst())
                 } else {
-                    appendURL = AppTaskUtils.app_baseURL! + url
+                    appendURL = AppTaskUtils.baseURL! + url
                 }
             } else { /// baseURL末尾没有"/"
                 if url.hasPrefix("/") == true {
-                    appendURL = AppTaskUtils.app_baseURL! + url
+                    appendURL = AppTaskUtils.baseURL! + url
                 } else {
-                    appendURL = AppTaskUtils.app_baseURL! + "/" + url
+                    appendURL = AppTaskUtils.baseURL! + "/" + url
                 }
             }
         }
@@ -272,7 +269,7 @@ class AppTaskUtils: NSObject {
 
     /// 用于缓存网络数据到本地沙盒
     func configCache(url: String, params: Dictionary<String, Any>, done: AnyObject) {
-        guard AppCacheUtils().configNewDocument(atPath: AppCacheUtils().cacheURL()) else {
+        guard AppCacheUtils().configCacheDocument(atPath: AppCacheUtils().cacheURL()) else {
             return
         }
 

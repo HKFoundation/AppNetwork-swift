@@ -46,11 +46,11 @@ class AppViewController: UIViewController {
             
         }
         
-        AppNetwork.reqForGet(url: "https://api.apiopen.top/getJoke", params: ["page" : "1", "count" : "2", "type" : "video"], appDone: { (done) in
-            
-        }) { (error) in
-            
-        }
+//        AppNetwork.reqForGet(url: "https://api.apiopen.top/getJoke", params: ["page" : "1", "count" : "2", "type" : "video"], appDone: { (done) in
+//            
+//        }) { (error) in
+//            
+//        }
         
 //        AppNetwork.breakTask(url: "https://api.apiopen.top/getJoke?page=1&count=2&type=video")
     }

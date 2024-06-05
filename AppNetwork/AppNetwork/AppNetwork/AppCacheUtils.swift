@@ -17,21 +17,21 @@ struct AppDownloadDone: Codable {
     init() {}
 }
 
-private var app_cache: String = "Documents/AppNetwork"
+private var cacheDocuments: String = "Documents/AppNetwork"
 
 class AppCacheUtils: NSObject {
     /// 设置缓存数据的目录，默认路径 Documents/AppNetwork，"Documents" 为系统中的文件夹
     func configCacheURL(atPath: String) {
-        app_cache = atPath
+        cacheDocuments = atPath
     }
 
     /// 获取缓存数据的目录
     func cacheURL() -> String {
-        return URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(app_cache).path
+        return URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(cacheDocuments).path
     }
 
     /// 判断文件夹目录是否存在，如果不存在会自动生成对应目录文件夹
-    func configNewDocument(atPath: String) -> Bool {
+    func configCacheDocument(atPath: String) -> Bool {
         /// 先判断目录是否存在
         if configDocumentExists(atPath: atPath) {
             return true
@@ -53,7 +53,7 @@ class AppCacheUtils: NSObject {
     }
 
     /// 读取数据并返回
-    func configContentLocal(atPath: String) -> Data? {
+    func configContentLoadLocal(atPath: String) -> Data? {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: atPath), options: Data.ReadingOptions.mappedIfSafe) else {
             return nil
         }

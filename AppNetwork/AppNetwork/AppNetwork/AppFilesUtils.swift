@@ -61,7 +61,7 @@ class AppFilesUtils: NSObject {
 
         breakTask(url: url)
 
-        let cache = configContentLocal(md5CacheURL: md5CacheURL)
+        let cache = configContentLoadLocal(md5CacheURL: md5CacheURL)
         var cacheURL: String = ""
 
         if let cache = cache {
@@ -84,17 +84,17 @@ class AppFilesUtils: NSObject {
     @discardableResult
     func reqForDownload(url: String, progess: @escaping AppTaskProgress, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest? {
         /// 1.首先对接口地址做格式化处理，设置域名、拼接地址、格式化地址
-        let formatURL = AppTaskUtils().formatURL(url: url)
+        let format = AppTaskUtils().formatURL(url: url)
 
         /// 2.如果需要存储下载文件的目录不存在，就先新建目录
         if AppCacheUtils().configDocumentExists(atPath: AppCacheUtils().cacheURL()) == false {
-            _ = AppCacheUtils().configNewDocument(atPath: AppCacheUtils().cacheURL())
+            _ = AppCacheUtils().configCacheDocument(atPath: AppCacheUtils().cacheURL())
         }
 
         /// 3.判断该文件是否已经下载完成，如果完成则直接返回
         let md5CacheURL = md5String(pText: AppTaskUtils().append(url: url, params: [:]))
         var cache = Dictionary<String, Any>.init()
-        cache = configContentLocal(md5CacheURL: md5CacheURL) ?? [:]
+        cache = configContentLoadLocal(md5CacheURL: md5CacheURL) ?? [:]
 
         /// 判断条件，progress 下载进度，code 自定义标识符
         /// 这里不能完全通过断点续传来判断是否下载完成，需要自己增加一个标识
@@ -106,10 +106,10 @@ class AppFilesUtils: NSObject {
         var appTask: DataRequest?
 
         /// 4.获取当前下载信息的缓存信息，如果为 0 则充新下载 否则继续下载
-        var currentLength: CLongLong = CLongLong(AppCacheUtils().bytesTotalCache(atPath: URL(fileURLWithPath: AppCacheUtils().cacheURL()).appendingPathComponent(formatURL.components(separatedBy: "/").last!).path) * 1000.0 * 1000.0)
+        var currentLength: CLongLong = CLongLong(AppCacheUtils().bytesTotalCache(atPath: URL(fileURLWithPath: AppCacheUtils().cacheURL()).appendingPathComponent(format.components(separatedBy: "/").last!).path) * 1000.0 * 1000.0)
 
         /// 5.建立请求信息
-        var request = URLRequest(url: URL(string: formatURL)!)
+        var request = URLRequest(url: URL(string: format)!)
         request.setValue("bytes=\(currentLength)-", forHTTPHeaderField: "Range")
         var app_flag: FileHandle?
 
@@ -189,7 +189,7 @@ class AppFilesUtils: NSObject {
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
     /// 保存当前下载文件信息
-    fileprivate func configContentSaveLocal(done: Dictionary<String, Any>, md5CacheURL: String) {
+    private func configContentSaveLocal(done: Dictionary<String, Any>, md5CacheURL: String) {
         var cache: Data?
         do {
             cache = try JSONSerialization.data(withJSONObject: done, options: .prettyPrinted)
@@ -201,8 +201,8 @@ class AppFilesUtils: NSObject {
     }
 
     /// 读取缓存数据
-    fileprivate func configContentLocal(md5CacheURL: String) -> Dictionary<String, Any>? {
-        let cache = AppCacheUtils().configContentLocal(atPath: URL(fileURLWithPath: AppCacheUtils().cacheURL()).appendingPathComponent(md5CacheURL).path)
+    private func configContentLoadLocal(md5CacheURL: String) -> Dictionary<String, Any>? {
+        let cache = AppCacheUtils().configContentLoadLocal(atPath: URL(fileURLWithPath: AppCacheUtils().cacheURL()).appendingPathComponent(md5CacheURL).path)
 
         if let cache = cache {
             var done: Any?

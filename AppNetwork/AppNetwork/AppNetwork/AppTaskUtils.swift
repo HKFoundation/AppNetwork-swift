@@ -70,58 +70,58 @@ class AppTaskUtils: NSObject {
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
     @discardableResult
-    func reqForGet(url: String, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return reqForGet(url: url, params: [:], appDone: appDone, appError: appError)
+    func reqForGet(url: String, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return reqForGet(url: url, params: [:], done: done, error: error)
     }
 
     @discardableResult
-    func reqForGet(url: String, params: [String: Any], appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return reqForGet(url: url, params: params, cache: false, appDone: appDone, appError: appError)
+    func reqForGet(url: String, params: [String: Any], done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return reqForGet(url: url, params: params, cache: false, done: done, error: error)
     }
 
     @discardableResult
-    func reqForGet(url: String, params: [String: Any], cache: Bool = false, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return reqForNetwork(url: url, mode: .get, params: params, cache: cache, appDone: appDone, appError: appError)
+    func reqForGet(url: String, params: [String: Any], cache: Bool = false, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return reqForNetwork(url: url, mode: .get, params: params, cache: cache, done: done, error: error)
     }
 
     @discardableResult
-    func reqForForm(url: String, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return reqForForm(url: url, params: [:], appDone: appDone, appError: appError)
+    func reqForForm(url: String, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return reqForForm(url: url, params: [:], done: done, error: error)
     }
 
     @discardableResult
-    func reqForForm(url: String, params: [String: Any], appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return reqForForm(url: url, params: params, cache: false, appDone: appDone, appError: appError)
+    func reqForForm(url: String, params: [String: Any], done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return reqForForm(url: url, params: params, cache: false, done: done, error: error)
     }
 
     @discardableResult
-    func reqForForm(url: String, params: [String: Any], cache: Bool = false, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return reqForNetwork(url: url, mode: .post, params: params, cache: cache, appDone: appDone, appError: appError)
+    func reqForForm(url: String, params: [String: Any], cache: Bool = false, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return reqForNetwork(url: url, mode: .post, params: params, cache: cache, done: done, error: error)
     }
 
     @discardableResult
-    private func reqForNetwork(url: String, mode: HTTPMethod, params: [String: Any], cache: Bool, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
+    private func reqForNetwork(url: String, mode: HTTPMethod, params: [String: Any], cache: Bool, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
         var appTask: DataRequest?
 
         md5CacheURL = md5String(pText: append(url: url, params: params))
         /// 1.首先对接口地址做格式化处理，设置域名、拼接地址、格式化地址
-        let format = formatURL(url: url)
+        let url = formatURL(url: url)
 
-        appTask = manager().request(format, method: mode, parameters: params, encoding: URLEncoding.default, headers: nil).response(completionHandler: { done in
+        appTask = manager().request(url, method: mode, parameters: params, encoding: URLEncoding.default, headers: nil).response(completionHandler: { response in
 
-            if done.data != nil && done.data?.count != 0 {
+            if response.data != nil && response.data?.count != 0 {
                 /// 2.控制台打印当前请求信息
-                let data = String(data: done.data!, encoding: .utf8)?.format as AnyObject
+                let data = String(data: response.data!, encoding: .utf8)?.format as AnyObject
 
-                self.appDoneLog(url: format, params: params, done: data)
+                self.appDoneLog(url: url, params: params, done: data)
                 /// 3.如果需要缓存则存储当前数据
                 if cache == true {
                     self.configCache(url: (appTask?.request?.url!.absoluteString)!, params: params, done: data)
                 }
                 /// 如果数据可以解析成字典则返回字典格式
-                let obj = self.configForFormat(data: done.data!)
+                let obj = self.configForFormat(data: response.data!)
 
-                appDone(obj != nil ? obj as AnyObject : data)
+                done(obj != nil ? obj as AnyObject : data)
             } else {
                 if cache == true {
                     let verify = self.verifyCacheURL(url: (appTask?.request?.url!.absoluteString)!, params: params)
@@ -129,13 +129,13 @@ class AppTaskUtils: NSObject {
                     if verify.flag {
                         let data = String(data: verify.cache!, encoding: .utf8)?.format as AnyObject
                         let obj = self.configForFormat(data: verify.cache!)
-                        appDone(obj != nil ? obj as AnyObject : data)
-                        self.appCacheLog(url: format, params: params, done: data)
+                        done(obj != nil ? obj as AnyObject : data)
+                        self.appCacheLog(url: url, params: params, done: data)
                     }
                 } else {
                     /// 5.当没有缓存数据时，直接返回错误信息
-                    self.appErrorLog(url: format, params: params, done: done.error! as NSError)
-                    appError(done.error as AnyObject)
+                    self.appErrorLog(url: url, params: params, done: response.error! as NSError)
+                    error(response.error as AnyObject)
                 }
             }
         })

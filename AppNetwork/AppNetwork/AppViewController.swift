@@ -40,13 +40,13 @@ class AppViewController: UIViewController {
 
 //        let url = "https://test.developerplat.com:8443/resource/49/5_7.3.3.apk"
 //        AppNetwork.breakTask(url: url, flag: true)
-        AppNetwork.reqForGet(url: "https://api.apiopen.top/getJoke?page=1&count=2&type=video", appDone: { (done) in
+        AppNetwork.reqForGet(url: "https://api.apiopen.top/getJoke?page=1&count=2&type=video", done: { (done) in
             
         }) { (error) in
             
         }
         
-//        AppNetwork.reqForGet(url: "https://api.apiopen.top/getJoke", params: ["page" : "1", "count" : "2", "type" : "video"], appDone: { (done) in
+//        AppNetwork.reqForGet(url: "https://api.apiopen.top/getJoke", params: ["page" : "1", "count" : "2", "type" : "video"], done: { (done) in
 //            
 //        }) { (error) in
 //            
@@ -58,25 +58,27 @@ class AppViewController: UIViewController {
     @objc func config1() {
         let url = "https://test.developerplat.com:8443/resource/49/5_7.3.3.apk"
 
+        
         AppNetwork.reqForDownload(url: url, progess: { _,_  in
             //            AppLog(progess)
-        }, appDone: { _ in
+        }, done: { _ in
             //            AppLog(done)
-        }, appError: { _ in
+        }, error: { _ in
 
         })
 
-        AppNetwork.reqForDownload(url: "https://mat1.gtimg.com//musictop/mp3/521/kunminghu.mp3", progess: { (_, _) in
-
-        }, appDone: { (_) in
-
-        }) { (_) in
-
+        
+        AppNetwork.reqForDownload(url: "https://mat1.gtimg.com//musictop/mp3/521/kunminghu.mp3") { bytesLoad, bytesTotal in
+            
+        } done: { done in
+            
+        } error: { error in
+            
         }
         
 //        AppFilesUtils.init().reqForDownload(url: "https://hyjj-chatm.oss-cn-beijing.aliyuncs.com/looktm-eye-report/2018%20%E6%AF%8D%E5%A9%B4%20App%20%E8%A1%8C%E4%B8%9A%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A.pdf", params: [:], progess: { (_, _) in
 //
-//        }, appDone: { (_) in
+//        }, done: { (_) in
 //
 //        }) { (_) in
 //

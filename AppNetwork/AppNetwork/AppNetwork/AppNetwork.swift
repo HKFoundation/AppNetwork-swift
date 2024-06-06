@@ -81,12 +81,12 @@ class AppNetwork: NSObject {
     ///
     /// - Parameters:
     ///   - url: 接口地址
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForGet(url: String, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForGet(url: url, appDone: appDone, appError: appError)
+    class func reqForGet(url: String, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return AppTaskUtils().reqForGet(url: url, done: done, error: error)
     }
 
     /// 有参数的 GET 网络请求
@@ -94,12 +94,12 @@ class AppNetwork: NSObject {
     /// - Parameters:
     ///   - url: 接口地址
     ///   - params: 接口请求参数
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForGet(url: String, params: [String: Any], appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForGet(url: url, params: params, appDone: appDone, appError: appError)
+    class func reqForGet(url: String, params: [String: Any], done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return AppTaskUtils().reqForGet(url: url, params: params, done: done, error: error)
     }
 
     /// 有参数、有缓存的 GET 网络请求
@@ -108,24 +108,24 @@ class AppNetwork: NSObject {
     ///   - url: 接口地址
     ///   - params: 接口请求参数
     ///   - cache: 是否缓存数据 default false
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForGet(url: String, params: [String: Any], cache: Bool = false, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForGet(url: url, params: params, cache: cache, appDone: appDone, appError: appError)
+    class func reqForGet(url: String, params: [String: Any], cache: Bool = false, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return AppTaskUtils().reqForGet(url: url, params: params, cache: cache, done: done, error: error)
     }
 
     /// 没有参数的 POST 网络请求
     ///
     /// - Parameters:
     ///   - url: 接口地址
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForForm(url: String, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForForm(url: url, appDone: appDone, appError: appError)
+    class func reqForForm(url: String, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return AppTaskUtils().reqForForm(url: url, done: done, error: error)
     }
 
     /// 有参数的 POST 网络请求
@@ -133,12 +133,12 @@ class AppNetwork: NSObject {
     /// - Parameters:
     ///   - url: 接口地址
     ///   - params: 接口请求参数
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForForm(url: String, params: [String: Any], appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForForm(url: url, params: params, appDone: appDone, appError: appError)
+    class func reqForForm(url: String, params: [String: Any], done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return AppTaskUtils().reqForForm(url: url, params: params, done: done, error: error)
     }
 
     /// 有参数、有缓存的 POST 网络请求
@@ -147,12 +147,12 @@ class AppNetwork: NSObject {
     ///   - url: 接口地址
     ///   - params: 接口请求参数
     ///   - cache: 是否缓存数据 default false
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForForm(url: String, params: [String: Any], cache: Bool = false, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForForm(url: url, params: params, cache: cache, appDone: appDone, appError: appError)
+    class func reqForForm(url: String, params: [String: Any], cache: Bool = false, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
+        return AppTaskUtils().reqForForm(url: url, params: params, cache: cache, done: done, error: error)
     }
 
     /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
@@ -165,11 +165,11 @@ class AppNetwork: NSObject {
     ///   - url: 接口地址
     ///   - params: 接口请求参数
     ///   - appProgess: 接口请求进度回调
-    ///   - appDone: 接口请求完成回调
-    ///   - appError: 接口请求出错回调
+    ///   - done: 接口请求完成回调
+    ///   - error: 接口请求出错回调
     /// - Returns: 返回 DownloadRequest 对象
     @discardableResult
-    class func reqForDownload(url: String, progess: @escaping AppTaskProgress, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest? {
-        return AppFilesUtils().reqForDownload(url: url, progess: progess, appDone: appDone, appError: appError)
+    class func reqForDownload(url: String, progess: @escaping AppTaskProgress, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest? {
+        return AppFilesUtils().reqForDownload(url: url, progess: progess, done: done, error: error)
     }
 }

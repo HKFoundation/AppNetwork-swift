@@ -56,8 +56,8 @@ class AppFilesUtils: NSObject {
 
     /// 删除已下载的文件
     func configEmptyCache(url: String, params: [String: Any]) {
-        let formatURL = AppTaskUtils().formatURL(url: url)
-        let md5CacheURL = md5String(pText: AppTaskUtils().append(url: formatURL, params: params))
+        let url = AppTaskUtils().formatURL(url: url)
+        let md5CacheURL = md5String(pText: AppTaskUtils().append(url: url, params: params))
 
         breakTask(url: url)
 
@@ -82,7 +82,7 @@ class AppFilesUtils: NSObject {
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
     @discardableResult
-    func reqForDownload(url: String, progess: @escaping AppTaskProgress, appDone: @escaping AppTaskDone, appError: @escaping AppTaskError) -> DataRequest? {
+    func reqForDownload(url: String, progess: @escaping AppTaskProgress, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest? {
         /// 1.首先对接口地址做格式化处理，设置域名、拼接地址、格式化地址
         let format = AppTaskUtils().formatURL(url: url)
 
@@ -113,13 +113,13 @@ class AppFilesUtils: NSObject {
         request.setValue("bytes=\(currentLength)-", forHTTPHeaderField: "Range")
         var app_flag: FileHandle?
 
-        appTask = manager?.request(request).response(completionHandler: { done in
+        appTask = manager?.request(request).response(completionHandler: { response in
             dataTasks.removeValue(forKey: md5CacheURL)
 
-            if !(done.error != nil) {
-                appDone(done.response as AnyObject)
+            if !(response.error != nil) {
+                done(response.response as AnyObject)
             } else {
-                appError(done.error as AnyObject)
+                error(response.error as AnyObject)
             }
         })
 

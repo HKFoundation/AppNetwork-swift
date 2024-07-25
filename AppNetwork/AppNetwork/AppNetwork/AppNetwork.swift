@@ -9,167 +9,184 @@
 import Alamofire
 import UIKit
 
-class AppNetwork: NSObject {
+class AppNetwork {
     /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
      * // MARK: - 网络基础配置
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
-    /// 设置请求超时时间，单位是秒
-    class func configLoadTimed(timed: TimeInterval) {
-        AppTaskUtils().configLoadTimed(timed: timed)
+    public var configuration: AppConfiguration
+    public var session: Alamofire.Session
+    public var monitor = ClosureEventMonitor()
+
+    /// 获取域名
+    var baseURL: URL {
+        assert(configuration.baseURL != nil, "AppNetwork: Please config the baseURL")
+        return configuration.baseURL!
     }
 
-    /// 用于指定网络请求接口的基础URL
-    class func configBaseURL(url: String) {
-        AppTaskUtils().configBaseURL(url: url)
+    /// 拦截器配置
+    var interceptor: AppInterceptor? {
+        configuration.interceptor
     }
 
-    /// 获取网络缓存的文件夹目录
-    class func cacheURL() -> String {
-        return AppCacheUtils().cacheURL()
+    /// 取消当前全部请求
+    public func cancel() {
+        session.session.getAllTasks { sessions in
+            sessions.forEach { $0.cancel() }
+        }
     }
 
-    /// 设置网络缓存的文件夹目录 default "Documents/AppNetwork"
-    class func configCacheURL(atPath: String) {
-        AppCacheUtils().configCacheURL(atPath: atPath)
+    /// 取消当前特定请求
+    public func cancel(url: String) {
+        session.session.getAllTasks { sessions in
+            for session in sessions {
+                if session.originalRequest?.url?.absoluteString == url {
+                    session.cancel(); break
+                }
+            }
+        }
     }
 
-    /// 获取缓存文件的大小 单位MB
-    class func bytesTotalCache() -> CGFloat {
-        return AppCacheUtils().bytesTotalCache()
+    public func suspend(url: String) {
+        session.session.getAllTasks { sessions in
+            for session in sessions {
+                if session.originalRequest?.url?.absoluteString == url {
+                    session.suspend(); break
+                }
+            }
+        }
     }
 
-    /// 清空网络数据缓存（所有的缓存包括下载文件）
-    class func configEmptyCache() {
-        AppCacheUtils().configEmptyCache(atPath: AppCacheUtils().cacheURL(), debugLog: nil)
+    public func resume(url: String) {
+        session.session.getAllTasks { sessions in
+            for session in sessions {
+                if session.originalRequest?.url?.absoluteString == url {
+                    session.resume(); break
+                }
+            }
+        }
     }
 
-    /// 取消特定连接请求
-    class func breakTask(url: String) {
-        AppTaskUtils().breakTask(url: url)
+    public static let shared = AppNetwork()
+
+    /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
+     * // MARK: 初始化方法
+     * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
+
+    public init(configuration: AppConfiguration) {
+        self.configuration = configuration
+        session = Session(eventMonitors: [monitor])
     }
 
-    /// 取消当前所有请求
-    class func breakTask() {
-        AppTaskUtils().breakTask()
+    convenience init() {
+        self.init(
+            configuration: AppConfiguration(baseURL: nil)
+        )
     }
 
     /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
-     * // MARK: - 文件下载基础配置
+     * // MARK: AppNetwork 接口请求
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
-    /// 取消特定连接文件下载请求（也用于暂停下载）
-    class func breakTask(url: String, flag: Bool = true) {
-        AppFilesUtils().breakTask(url: url)
+    /// 网络请求接口
+    /// - Parameters:
+    ///   - url: 接口地址
+    ///   - method: 发送方式. `.get` by default.
+    ///   - parameters: 发送参数
+    ///   - succeed: 接口请求完成回调
+    ///   - failed: 接口请求出错回调
+    ///   - Returns: 返回 DataRequest 对象
+    @discardableResult
+    func request(url: String,
+                 method: HTTPMethod = .get,
+                 parameters: Parameters? = nil,
+                 succeed: @escaping AppTaskDone,
+                 failed: @escaping AppTaskError) -> DataRequest? {
+        return AppTaskRequest.request(url: url, method: method, parameters: parameters, succeed: succeed, failed: failed)
     }
 
-    /// 取消当前所有的文件下载请求
-    class func breakTask(flag: Bool = true) {
-        AppFilesUtils().breakTask()
+    /// 下载文件接口
+    /// - Parameters:
+    ///   - url: 接口地址
+    ///   - method: 发送方式. `.get` by default.
+    ///   - parameters: 发送参数
+    ///   - resume: 重新开始. `true` by default.
+    ///             true 会在下载完成后才保存在沙盒，同名文件会覆盖 false 会继续之前的下载进度
+    ///   - progress: 下载进度
+    ///   - succeed: 接口请求完成回调
+    ///   - failed: 接口请求出错回调
+    /// - Returns: 返回 Request 对象
+    @discardableResult
+    func download(url: String,
+                  method: HTTPMethod = .get,
+                  parameters: Parameters? = nil,
+                  resume: Bool = true,
+                  progress: @escaping AppTaskProgress,
+                  succeed: @escaping AppTaskDone,
+                  failed: @escaping AppTaskError) -> Request? {
+        return AppDownloadRequest.request(url: url, method: method, parameters: parameters, resume: resume, progress: progress, succeed: succeed, failed: failed)
     }
 
-    /// 删除已下载的文件
-    class func configEmptyCache(url: String, params: [String: Any]) {
-        AppFilesUtils().configEmptyCache(url: url, params: params)
+    /// 上传文件接口
+    /// - Parameters:
+    ///   - url: 接口地址
+    ///   - method: 发送方式. `.post` by default.
+    ///   - remote: 服务器用来接收文件的字段
+    ///   - local: 待上传文件存在的目录
+    ///   - mineType: 待上传文件的类型
+    ///   - resume: 重新开始. `true` by default.
+    ///             true 主要做一次性上传，上传图片、文件等 false 会将文件分片上传、会记录分片信息、可中断上传
+    ///   - progress: 上传进度
+    ///   - succeed: 接口请求完成回调
+    ///   - failed: 接口请求出错回调
+    /// - Returns: 返回 Request 对象
+    @discardableResult
+    func upload(url: String,
+                method: HTTPMethod = .post,
+                remote: String,
+                local: String,
+                mineType: String,
+                resume: Bool = true,
+                progress: @escaping AppTaskProgress,
+                succeed: @escaping AppTaskDone,
+                failed: @escaping AppTaskError) -> UploadRequest? {
+        return AppUploadRequest.request(url: url, method: method, remote: remote, local: local, mineType: mineType, resume: resume, progress: progress, succeed: succeed, failed: failed)
     }
 
     /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
-     * // MARK: - 接口请求业务
+     * // MARK: Alamofire 接口请求
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
-    /// 没有参数的 GET 网络请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForGet(url: String, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForGet(url: url, done: done, error: error)
+    func request(_ convertible: URLConvertible,
+                 method: HTTPMethod = .get,
+                 parameters: Parameters? = nil,
+                 encoding: ParameterEncoding = URLEncoding.default,
+                 headers: HTTPHeaders? = nil,
+                 interceptor: RequestInterceptor? = nil,
+                 modifier: Alamofire.Session.RequestModifier? = nil) -> DataRequest {
+        return session.request(convertible, method: method, parameters: parameters, encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: modifier)
     }
 
-    /// 有参数的 GET 网络请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - params: 接口请求参数
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForGet(url: String, params: [String: Any], done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForGet(url: url, params: params, done: done, error: error)
+    func download(_ convertible: URLConvertible,
+                  method: HTTPMethod = .get,
+                  parameters: Parameters? = nil,
+                  encoding: ParameterEncoding = URLEncoding.default,
+                  headers: HTTPHeaders? = nil,
+                  interceptor: RequestInterceptor? = nil,
+                  modifier: Alamofire.Session.RequestModifier? = nil,
+                  to destination: DownloadRequest.Destination? = nil) -> DownloadRequest {
+        return session.download(convertible, method: method, parameters: parameters, encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: modifier, to: destination)
     }
 
-    /// 有参数、有缓存的 GET 网络请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - params: 接口请求参数
-    ///   - cache: 是否缓存数据 default false
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DataRequest 对象
     @discardableResult
-    class func reqForGet(url: String, params: [String: Any], cache: Bool = false, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForGet(url: url, params: params, cache: cache, done: done, error: error)
-    }
-
-    /// 没有参数的 POST 网络请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DataRequest 对象
-    @discardableResult
-    class func reqForForm(url: String, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForForm(url: url, done: done, error: error)
-    }
-
-    /// 有参数的 POST 网络请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - params: 接口请求参数
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DataRequest 对象
-    @discardableResult
-    class func reqForForm(url: String, params: [String: Any], done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForForm(url: url, params: params, done: done, error: error)
-    }
-
-    /// 有参数、有缓存的 POST 网络请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - params: 接口请求参数
-    ///   - cache: 是否缓存数据 default false
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DataRequest 对象
-    @discardableResult
-    class func reqForForm(url: String, params: [String: Any], cache: Bool = false, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest {
-        return AppTaskUtils().reqForForm(url: url, params: params, cache: cache, done: done, error: error)
-    }
-
-    /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
-     * // MARK: - 文件下载请求业务
-     * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
-
-    /// 下载文件请求
-    ///
-    /// - Parameters:
-    ///   - url: 接口地址
-    ///   - params: 接口请求参数
-    ///   - appProgess: 接口请求进度回调
-    ///   - done: 接口请求完成回调
-    ///   - error: 接口请求出错回调
-    /// - Returns: 返回 DownloadRequest 对象
-    @discardableResult
-    class func reqForDownload(url: String, progess: @escaping AppTaskProgress, done: @escaping AppTaskDone, error: @escaping AppTaskError) -> DataRequest? {
-        return AppFilesUtils().reqForDownload(url: url, progess: progess, done: done, error: error)
+    func upload(multipartFormData: @escaping (MultipartFormData) -> Void,
+                to url: URLConvertible,
+                method: HTTPMethod = .post,
+                headers: HTTPHeaders? = nil,
+                interceptor: RequestInterceptor? = nil,
+                modifier: Alamofire.Session.RequestModifier? = nil) -> UploadRequest {
+        return session.upload(multipartFormData: multipartFormData, to: url, method: method, headers: headers, interceptor: interceptor, requestModifier: modifier)
     }
 }

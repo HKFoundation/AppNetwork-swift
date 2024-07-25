@@ -9,11 +9,11 @@
 import UIKit
 
 /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
- * 本类主要用于处理网络请求中的错误信息反馈
+ * // MARK: 处理网络请求中的错误信息
  * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
 class AppError: NSObject {
-    func errorCodesForSystem(code: Int) -> String {
+    func errorCodesForSystem(error: NSError) -> String {
         let codes = [-998: "发生未知错误",
                      -999: "连接被取消",
                      -1000: "连接失败，由于URL格式错误",
@@ -59,6 +59,6 @@ class AppError: NSObject {
                      -3006: "下载失败，因为下载数据的解码在流中失败",
                      -3007: "下载失败，因为下载数据的解码未能完成"] as [Int: String]
 
-        return codes[code] ?? "无法识别的错误码"
+        return codes[error.code] ?? error.localizedDescription
     }
 }

@@ -9,34 +9,34 @@
 import UIKit
 
 /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
- * 本类主要用于处理网络请求地址连接
+ * // MARK: 处理网络请求地址
  * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
 class AppURL: NSObject {
     func baseURL(url: String) -> String {
         #if DEBUG
-        return debugURL(url: url)
+            return debugURL(url: url)
         #else
-        return openURL(url: url)
+            return releaseURL(url: url)
         #endif
     }
-    
+
     /// 测试库接口域名
     func debugURL(url: String) -> String {
         /// 用于判断接口地址属于哪个域名
         let domain_1: Set<String> = [k_push]
-        
+
         if domain_1.contains(url) == true {
             return "wss://app.developerplat.com:8088"
         }
         return "http://192.168.1.154:8090"
     }
-    
+
     /// 正式库接口域名
-    func appURL(url: String) -> String {
+    func releaseURL(url: String) -> String {
         /// 用于判断接口地址属于哪个域名
         let domain_1: Set<String> = [k_push]
-        
+
         if domain_1.contains(url) == true {
             return "wss://msg.baoduitong.com:8989/ws"
         }
@@ -64,6 +64,3 @@ var k_query_upsert = "/app/upsert"
 
 /// 消息推送
 var k_push = "wss://app.developerplat.com:8088/ws/getPushMsg"
-
-
-

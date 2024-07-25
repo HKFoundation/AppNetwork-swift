@@ -4,5 +4,5 @@ inhibit_all_warnings!
 
 target 'AppNetwork' do
   # swift 框架
-    pod 'Alamofire', '~> 4.9.1'
+    pod 'Alamofire', '~> 5.9.1'
 end

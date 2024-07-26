@@ -147,20 +147,20 @@ open class AppUploadRequest: AppBaseRequest {
 
     override open func succeedLog(response: Any) {
         guard let parameters = parameters else {
-            AppLog("🍀 文件上传成功\n URL：\(url.absoluteString)\n 返回数据：\(response)")
+            printk("🍀 文件上传成功\n URL：\(url.absoluteString)\n 返回数据：\(response)")
             return
         }
 
-        AppLog("🍀 文件上传成功\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n 返回数据：\(response)")
+        printk("🍀 文件上传成功\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n 返回数据：\(response)")
     }
 
     override open func failedLog(error: NSError) {
         let code = error.code
         guard let parameters = parameters else {
-            AppLog("⚠️ 文件上传失败\n URL：\(url.absoluteString)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
+            printk("⚠️ 文件上传失败\n URL：\(url.absoluteString)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
             return
         }
 
-        AppLog("⚠️ 文件上传失败\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
+        printk("⚠️ 文件上传失败\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
     }
 }

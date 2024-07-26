@@ -88,21 +88,21 @@ open class AppTaskRequest: AppBaseRequest {
     /// 请求成功日志
     override open func succeedLog(response: Any) {
         guard let parameters = parameters else {
-            AppLog("🍀 数据请求成功\n URL：\(url.absoluteString)\n 返回数据：\(response)")
+            printk("🍀 数据请求成功\n URL：\(url.absoluteString)\n 返回数据：\(response)")
             return
         }
 
-        AppLog("🍀 数据请求成功\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n 返回数据：\(response)")
+        printk("🍀 数据请求成功\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n 返回数据：\(response)")
     }
 
     /// 请求失败日志
     override open func failedLog(error: NSError) {
         let code = error.code
         guard let parameters = parameters else {
-            AppLog("⚠️ 数据请求失败\n URL：\(url.absoluteString)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
+            printk("⚠️ 数据请求失败\n URL：\(url.absoluteString)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
             return
         }
 
-        AppLog("⚠️ 数据请求失败\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
+        printk("⚠️ 数据请求失败\n URL：\(url.absoluteString)\n 请求参数：\(parameters)\n Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
     }
 }

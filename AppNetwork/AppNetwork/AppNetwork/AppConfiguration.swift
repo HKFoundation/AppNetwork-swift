@@ -41,18 +41,27 @@ public enum AppDebugLevel: Int {
     case error
 }
 
-public func print(message: String, level: AppDebugLevel = .debug) {
+public func printk(_ k: Any..., file: String = #file, func: String = #function, line: Int = #line, level: AppDebugLevel = .debug) {
+    let message = k.compactMap { "\($0)" }.joined(separator: "")
+    
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+
     switch AppNetwork.shared.configuration.debugLevel {
     case .none:
         return
     case .debug:
-        AppLog(message)
+        process()
     case .info:
-        if level == .info { AppLog(message) }
+        if level == .info || level == .warning || level == .error { process() }
     case .warning:
-        if level == .warning { AppLog(message) }
+        if level == .warning || level == .error { process() }
     case .error:
-        if level == .error { AppLog(message) }
+        if level == .error { process() }
+    }
+
+    func process() {
+        print("🇺🇳 \(formatter.string(from: Date())) \((file as NSString).lastPathComponent)[\(line)] - [message: \(message)]")
     }
 }
 

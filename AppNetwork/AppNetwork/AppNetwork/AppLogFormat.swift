@@ -38,7 +38,7 @@ extension String {
         do {
             done = try PropertyListSerialization.propertyList(from: data!, options: [.mutableContainers], format: nil) as! String
         } catch {
-            AppLog("⚠️ Unicode转换失败 Error：\(error)")
+            printk("⚠️ Unicode转换失败 Error：\(error)")
         }
         return done.replacingOccurrences(of: "\\n", with: "\n")
     }

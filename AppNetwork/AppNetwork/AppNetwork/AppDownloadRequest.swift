@@ -198,11 +198,11 @@ open class AppDownloadRequest: AppBaseRequest {
      * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
 
     override open func succeedLog(response: Any) {
-        AppLog("🍀 文件下载成功\n URL：\(cache.cacheURL().appendingPathComponent(url.lastPathComponent).path)")
+        printk("🍀 文件下载成功\n URL：\(cache.cacheURL().appendingPathComponent(url.lastPathComponent).path)")
     }
 
     override open func failedLog(error: NSError) {
         let code = error.code
-        AppLog("⚠️ 文件下载失败 Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
+        printk("⚠️ 文件下载失败 Error：\(AppError().errorCodesForSystem(error: error)) \(code)")
     }
 }

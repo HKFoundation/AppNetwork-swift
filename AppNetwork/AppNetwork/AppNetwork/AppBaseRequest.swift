@@ -84,6 +84,6 @@ open class AppBaseRequest: NSObject {
     open func failedLog(error: NSError) {}
 
     deinit {
-        print("deinit")
+        printk("deinit")
     }
 }

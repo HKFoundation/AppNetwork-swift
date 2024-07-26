@@ -12,13 +12,27 @@ import UIKit
 /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
  * // MARK: - 日志输出
  * ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*/
-public func AppLog(_ k: Any..., file: String = #file, func: String = #function, line: Int = #line) {
-    #if DEBUG
-        let message = k.compactMap { "\($0)" }.joined(separator: "")
-        print("🇺🇳 \((file as NSString).lastPathComponent)[\(line)] - [message: \(message)]")
-    #else
-        // TODO: 线上环境日志保存到沙盒
-    #endif
+
+public func AppLog() {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+
+    let manager = FileManager.default
+    let url = URL(fileURLWithPath: AppCacheManager.shared.cacheURL().appendingPathComponent("\(formatter.string(from: Date())).log").path)
+
+    if !manager.fileExists(atPath: url.path) {
+        manager.createFile(atPath: url.path, contents: nil, attributes: nil)
+    }
+
+    if let handle = try? FileHandle(forWritingTo: url) {
+        handle.seekToEndOfFile()
+
+        // 将标准输出重定向到文件
+        dup2(handle.fileDescriptor, STDOUT_FILENO)
+
+        // 将标准错误重定向到文件
+        dup2(handle.fileDescriptor, STDERR_FILENO)
+    }
 }
 
 /* ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄＊ ┄┅┄┅┄┅┄┅┄*
@@ -65,7 +79,11 @@ public let AppHeight: CGFloat = UIScreen.main.bounds.size.height
 /// 状态栏高度
 public func AppTopBarHeight() -> CGFloat {
     if #available(iOS 13.0, *) {
-        return UIApplication.shared.windows.first?.windowScene?.statusBarManager?.statusBarFrame.height ?? 20.0
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            return scene.statusBarManager?.statusBarFrame.height ?? 20.0
+        } else {
+            return 20.0
+        }
     } else {
         return UIApplication.shared.statusBarFrame.height
     }

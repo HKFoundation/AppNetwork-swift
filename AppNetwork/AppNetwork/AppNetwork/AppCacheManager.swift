@@ -39,10 +39,10 @@ class AppCacheManager: NSObject {
 
         do {
             try FileManager.default.createDirectory(atPath: atPath, withIntermediateDirectories: true, attributes: nil)
-            AppLog("🍀 缓存目录创建成功")
+            printk("🍀 缓存目录创建成功")
             return true
         } catch {
-            AppLog("⚠️ 缓存目录创建失败 Error：\(error.localizedDescription)")
+            printk("⚠️ 缓存目录创建失败 Error：\(error.localizedDescription)")
             return false
         }
     }
@@ -97,17 +97,18 @@ class AppCacheManager: NSObject {
     }
 
     /// 清空网络数据缓存
-    func configEmptyCache(atPath: String, debugLog: String?) {
+    func configEmptyCache(atPath: String) {
         guard configFileExists(atPath: atPath) else {
-            AppLog("⚠️ 清空缓存失败 Error：没有找到指定的文件目录")
+            printk("⚠️ 清空缓存失败 Error：没有找到指定的文件目录")
             return
         }
 
+        let url = URL(fileURLWithPath: atPath)
         do {
             try FileManager.default.removeItem(atPath: atPath)
-            AppLog(debugLog?.count == 0 ? "🍀 清空缓存成功" : "🍀 \(debugLog!) 文件清空成功")
+            printk("🍀 \(url.lastPathComponent) 文件清空成功")
         } catch {
-            AppLog(debugLog?.count == 0 ? "⚠️ 清空缓存失败 Error：\(error.localizedDescription)" : "⚠️ \(debugLog!) 文件清空失败 Error：\(error.localizedDescription)")
+            printk("⚠️ \(url.lastPathComponent) 文件清空失败 Error：\(error.localizedDescription)")
         }
     }
 }

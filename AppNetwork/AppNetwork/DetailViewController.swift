@@ -10,13 +10,18 @@ import Alamofire
 import UIKit
 
 class DetailViewController: UIViewController {
-    
     deinit {
-        print("DetailViewController deinit")
+        printk("DetailViewController deinit")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        #if DEBUG
+        AppLog()
+        #else
+            AppLog()
+        #endif
 
         view.backgroundColor = .white
 
@@ -73,13 +78,17 @@ class DetailViewController: UIViewController {
 
     // 下载文件
     @objc func config() {
-        
 //    https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4
 
         var configuration = AppConfiguration(baseURL: URL(string: "https://download.blender.org"))
 
 //        var configuration = AppConfiguration(baseURL: URL(string: "http://161.189.189.3"))
         configuration.interceptor = nil
+        #if DEBUG
+            configuration.debugLevel = .debug
+        #else
+            configuration.debugLevel = .error
+        #endif
         AppNetwork.shared.configuration = configuration
 
         let url = "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
@@ -87,8 +96,7 @@ class DetailViewController: UIViewController {
 //        let url = "http://161.189.189.3/package/update_package_v1.1.any_to_v1.1.30.tar.bz2"
 
         AppNetwork.shared.download(url: url) { bytesLoad, bytesTotal in
-            print(Double(bytesLoad) / Double(bytesTotal) * 100)
-//            print(bytesLoad, bytesTotal)
+            printk(Double(bytesLoad) / Double(bytesTotal) * 100)
         } succeed: { _ in
 
         } failed: { _ in
@@ -123,7 +131,6 @@ class DetailViewController: UIViewController {
 
     // 文件上传
     @objc func config2() {
-        
 //        var configuration = AppConfiguration(baseURL: URL(string: "https://file.io"))
         var configuration = AppConfiguration(baseURL: URL(string: "http://localhost:3000"))
         configuration.interceptor = UploadInterceptor()
@@ -131,25 +138,23 @@ class DetailViewController: UIViewController {
 //        20210507210619313
 //        BigBuckBunny_320x180
         if let local = Bundle.main.path(forResource: "BigBuckBunny_320x180", ofType: "mp4") {
-            print("Image path: \(local)")
-            
+            printk("Image path: \(local)")
+
 //            video/mp4
 //            image/gif
-            AppNetwork.shared.upload(url: "http://localhost:3000/upload",remote: "file", local: local, mineType: "video/mp4",resume: false) { bytesLoad, bytesTotal in
-//                print(bytesLoad, bytesTotal)
+            AppNetwork.shared.upload(url: "http://localhost:3000/upload", remote: "file", local: local, mineType: "video/mp4", resume: false) { _, _ in
             } succeed: { _ in
 
             } failed: { _ in
             }
 
 //            AppNetwork.shared.upload(url: "https://file.io/?expires=1w", remote: "file", local: local, mineType: "image/gif") { bytesLoad, _ in
-//                print(bytesLoad)
 //            } succeed: { _ in
 //
 //            } failed: { _ in
 //            }
         } else {
-            print("Image not found in bundle")
+            printk("Image not found in bundle")
         }
     }
 }

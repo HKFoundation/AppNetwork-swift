@@ -18,8 +18,13 @@ public func AppLog() {
     formatter.dateFormat = "yyyy-MM-dd"
 
     let manager = FileManager.default
-    let url = URL(fileURLWithPath: AppCacheManager.shared.cacheURL().appendingPathComponent("\(formatter.string(from: Date())).log").path)
-
+    
+    let document = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents/AppLog")
+    if !manager.fileExists(atPath: document.path) {
+        try? manager.createDirectory(atPath: document.path, withIntermediateDirectories: true, attributes: nil)
+    }
+    
+    let url = URL(fileURLWithPath: document.appendingPathComponent("\(formatter.string(from: Date())).log").path)
     if !manager.fileExists(atPath: url.path) {
         manager.createFile(atPath: url.path, contents: nil, attributes: nil)
     }

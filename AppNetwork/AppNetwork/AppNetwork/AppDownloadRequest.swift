@@ -23,7 +23,7 @@ open class AppDownloadRequest: AppBaseRequest {
 
     @discardableResult
     open class func request(url: String, method: HTTPMethod = .get, parameters: Parameters? = nil, resume: Bool = true, progress: @escaping AppTaskProgress, succeed: AppTaskDone?, failed: AppTaskError?) -> Request? {
-        let path = URL(string: url)?.path(percentEncoded: false) ?? ""
+        let path = URL(string: url)?.path ?? ""
 
         /// 1.实例化 request 对象
         let req: AppDownloadRequest = self.init(path: path)

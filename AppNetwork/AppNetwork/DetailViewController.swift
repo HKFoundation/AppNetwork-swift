@@ -18,12 +18,14 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
 
         #if DEBUG
-        AppLog()
+//            AppLog()
         #else
-            AppLog()
+//            AppLog()
         #endif
 
         view.backgroundColor = .white
+
+        title = "详情"
 
         let download_btn = UIButton(type: .custom)
         download_btn.titleLabel?.font = UIFont(name: "Menlo-Bold", size: 12)
@@ -80,9 +82,9 @@ class DetailViewController: UIViewController {
     @objc func config() {
 //    https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4
 
-        var configuration = AppConfiguration(baseURL: URL(string: "https://download.blender.org"))
+//        var configuration = AppConfiguration(baseURL: URL(string: "https://download.blender.org"))
 
-//        var configuration = AppConfiguration(baseURL: URL(string: "http://161.189.189.3"))
+        var configuration = AppConfiguration(baseURL: URL(string: "http://161.189.189.3"))
         configuration.interceptor = nil
         #if DEBUG
             configuration.debugLevel = .debug
@@ -91,11 +93,11 @@ class DetailViewController: UIViewController {
         #endif
         AppNetwork.shared.configuration = configuration
 
-        let url = "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
+//        let url = "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
 
-//        let url = "http://161.189.189.3/package/update_package_v1.1.any_to_v1.1.30.tar.bz2"
+        let url = "http://161.189.189.3/package/update_package_v1.1.any_to_v1.1.30.tar.bz2"
 
-        AppNetwork.shared.download(url: url) { bytesLoad, bytesTotal in
+        AppNetwork.shared.download(url: url, resume: false) { bytesLoad, bytesTotal in
             printk(Double(bytesLoad) / Double(bytesTotal) * 100)
         } succeed: { _ in
 
@@ -105,7 +107,8 @@ class DetailViewController: UIViewController {
 
     // 暂停下载
     @objc func config3() {
-        let url = "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
+        let url = "http://161.189.189.3/package/update_package_v1.1.any_to_v1.1.30.tar.bz2"
+//        let url = "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
 //        AppNetwork.shared.suspend(url: url)
         AppNetwork.shared.cancel(url: url)
     }

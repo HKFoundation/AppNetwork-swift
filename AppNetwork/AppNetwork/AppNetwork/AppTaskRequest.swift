@@ -16,7 +16,7 @@ open class AppTaskRequest: AppBaseRequest {
 
     @discardableResult
     open class func request(url: String, method: HTTPMethod = .get, parameters: Parameters? = nil, succeed: AppTaskDone?, failed: AppTaskError?) -> DataRequest? {
-        let path = URL(string: url)?.path(percentEncoded: false) ?? ""
+        let path = URL(string: url)?.path ?? ""
 
         /// 1.实例化 request 对象
         let req: AppTaskRequest = self.init(path: path)

@@ -16,7 +16,7 @@ open class AppUploadRequest: AppBaseRequest {
 
     @discardableResult
     open class func request(url: String, method: HTTPMethod = .post, parameters: Parameters? = nil, remote: String, local: String, mineType: String, resume: Bool = true, progress: @escaping AppTaskProgress, succeed: AppTaskDone?, failed: AppTaskError?) -> UploadRequest? {
-        let path = URL(string: url)?.path(percentEncoded: false) ?? ""
+        let path = URL(string: url)?.path ?? ""
 
         /// 1.实例化 request 对象
         let req: AppUploadRequest = self.init(path: path)

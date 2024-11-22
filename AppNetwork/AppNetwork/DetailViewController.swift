@@ -3,7 +3,7 @@
 //  AppNetwork
 //
 //  Created by ✐ ᵕ̈ ᴹᴼᴿᴺᴵᴺᴳ on 2024/7/2.
-//  Copyright © 2024 北京卡友在线科技有限公司. All rights reserved.
+//  Copyright © 2024 深眸科技（北京）有限公司. All rights reserved.
 //
 
 import Alamofire

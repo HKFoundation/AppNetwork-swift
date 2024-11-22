@@ -3,7 +3,7 @@
 //  AppNetworkUITests
 //
 //  Created by bormil on 2020/9/15.
-//  Copyright © 2020 北京卡友在线科技有限公司. All rights reserved.
+//  Copyright © 2020 深眸科技（北京）有限公司. All rights reserved.
 //
 
 import XCTest

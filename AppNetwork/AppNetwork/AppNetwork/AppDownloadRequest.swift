@@ -3,7 +3,7 @@
 //  AppNetwork
 //
 //  Created by bormil on 2024/6/25.
-//  Copyright © 2024 北京卡友在线科技有限公司. All rights reserved.
+//  Copyright © 2024 深眸科技（北京）有限公司. All rights reserved.
 //
 
 import Alamofire
@@ -50,6 +50,8 @@ open class AppDownloadRequest: AppBaseRequest {
     ///   - parameters: 发送参数
     open func prepare(path: String, method: HTTPMethod = .get, parameters: Parameters? = nil) {
         self.method = method
+        
+        self.encoding = self.method == .post ? JSONEncoding.default : URLEncoding.default
 
         let parameters: Parameters? = config.interceptor?.interceptor(self, parameters: parameters) ?? parameters
         self.parameters = parameters

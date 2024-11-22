@@ -3,7 +3,7 @@
 //  AppNetwork
 //
 //  Created by bormil on 2020/5/12.
-//  Copyright © 2020 北京卡友在线科技有限公司. All rights reserved.
+//  Copyright © 2020 深眸科技（北京）有限公司. All rights reserved.
 //
 
 import UIKit
@@ -24,43 +24,54 @@ class AppURL: NSObject {
     /// 测试库接口域名
     func debugURL(url: String) -> String {
         /// 用于判断接口地址属于哪个域名
-        let domain_1: Set<String> = [k_push]
+        let domain_1: Set<String> = [k_upgrade]
+        let domain_2: Set<String> = [k_package]
 
-        if domain_1.contains(url) == true {
-            return "wss://app.developerplat.com:8088"
+        if domain_1.contains(where: { url.hasPrefix($0) }) {
+            return "https://api.blinktech.com.cn"
         }
-        return "http://192.168.1.154:8090"
+        
+        if domain_2.contains(where: { url.hasPrefix($0) }) {
+            return "https://static.xbotgo.com"
+        }
+        return "http://161.189.189.3"
     }
 
     /// 正式库接口域名
     func releaseURL(url: String) -> String {
         /// 用于判断接口地址属于哪个域名
-        let domain_1: Set<String> = [k_push]
+        let domain_1: Set<String> = [k_upgrade]
+        let domain_2: Set<String> = [k_package]
 
-        if domain_1.contains(url) == true {
-            return "wss://msg.baoduitong.com:8989/ws"
+        if domain_1.contains(where: { url.hasPrefix($0) }) {
+            return ""
         }
-        return "https://app.baoduitong.com"
+
+        if domain_2.contains(where: { url.hasPrefix($0) }) {
+            return ""
+        }
+        
+        return ""
     }
 }
 
 /// 账号登录
-var k_login: String = "/app/doLogin"
+var k_login: String = "/device/api/login"
 
-/// 验证码登录
-var k_login_code: String = "/app/doLoginSms"
+/// 获取 taskId
+var k_receive: String = "/device/api/receive"
 
-/// 获取验证码
-var k_code: String = "/app/getSmsCode"
+/// 上传操作行为
+var k_opt: String = "/device/api/opt"
 
-/// 校验验证码
-var k_check_code: String = "/app/checkSmsCode"
+/// 获取 OTA 升级包下载地址
+var k_upgrade: String = "/upgrade"
 
-/// 模型查询
-var k_query: String = "/app/query"
+/// 下载 OTA 升级包
+var k_package: String = "/package/chameleon"
 
-/// 模型修改、添加、删除
-var k_query_upsert = "/app/upsert"
+/// 上报设备信息
+var k_clone: String = "/device/api/clone"
 
-/// 消息推送
-var k_push = "wss://app.developerplat.com:8088/ws/getPushMsg"
+/// 上报抽检结果
+var k_spot_check: String = "/device/api/spot/check/state"

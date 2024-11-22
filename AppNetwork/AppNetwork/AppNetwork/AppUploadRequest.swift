@@ -3,7 +3,7 @@
 //  AppNetwork
 //
 //  Created by bormil on 2024/6/29.
-//  Copyright © 2024 北京卡友在线科技有限公司. All rights reserved.
+//  Copyright © 2024 深眸科技（北京）有限公司. All rights reserved.
 //
 
 import Alamofire
@@ -38,6 +38,8 @@ open class AppUploadRequest: AppBaseRequest {
     ///   - parameters: 发送参数
     open func prepare(path: String, method: HTTPMethod = .get, parameters: Parameters? = nil) {
         self.method = method
+        
+        self.encoding = self.method == .post ? JSONEncoding.default : URLEncoding.default
 
         let parameters: Parameters? = config.interceptor?.interceptor(self, parameters: parameters) ?? parameters
         self.parameters = parameters
@@ -57,18 +59,9 @@ open class AppUploadRequest: AppBaseRequest {
     open func process(response: AFDataResponse<Data?>, succeed: AppTaskDone?, failed: AppTaskError? = nil) {
         switch response.result {
         case let .success(data):
-            guard let data = data else { return }
-
-            do {
-                let obj = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: Any]
-                succeedLog(response: String(data: data, encoding: .utf8)?.format ?? "")
-                succeed?(obj)
-            } catch {
-                let error = AFError.responseSerializationFailed(reason: .jsonSerializationFailed(error: error))
-
-                failedLog(error: error as NSError)
-                failed?(error)
-            }
+            succeedLog(response: String(data: data ?? Data(), encoding: .utf8)?.format ?? "")
+            succeed?(data as Any)
+            
         case let .failure(error):
             failedLog(error: error as NSError)
             failed?(error)

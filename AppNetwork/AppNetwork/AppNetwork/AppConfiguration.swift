@@ -3,7 +3,7 @@
 //  AppNetwork
 //
 //  Created by bormil on 2024/6/12.
-//  Copyright © 2024 北京卡友在线科技有限公司. All rights reserved.
+//  Copyright © 2024 深眸科技（北京）有限公司. All rights reserved.
 //
 
 import Alamofire
@@ -46,6 +46,7 @@ public func printk(_ k: Any..., file: String = #file, func: String = #function, 
     
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    formatter.locale = Locale(identifier: "en_US_POSIX")
 
     switch AppNetwork.shared.configuration.debugLevel {
     case .none:
